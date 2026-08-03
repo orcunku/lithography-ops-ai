@@ -1,0 +1,10 @@
+# Minimal dependencies for deploying the Streamlit dashboard on Streamlit Cloud.
+# Excludes the heavy RAG/LLM libraries (torch, transformers, sentence-transformers,
+# faiss) which the dashboard does not need — the Knowledge agent falls back to
+# keyword search when those aren't present.
+pandas>=2.0
+numpy>=1.24,<2.0
+scikit-learn>=1.3
+joblib>=1.3
+plotly>=5.18
+streamlit>=1.30
