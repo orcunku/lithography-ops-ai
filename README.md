@@ -1,4 +1,10 @@
 # Lithography Ops AI — EUV/DUV Operations Intelligence
+## 🔗 Links
+
+- 🌐 **Live landing page:** https://orcunku.github.io/lithography-ops-ai/
+- 📊 **Live interactive demo:** https://lithography-ops-ai-dgdzup5loqobyvwxvwsjba.streamlit.app/
+- 📄 **Project report (PDF):** [docs/LithoOps_AI_Explanation_Report.pdf](docs/LithoOps_AI_Explanation_Report.pdf)
+- 💻 **Source code:** https://github.com/orcunku/lithography-ops-ai
 
 A portfolio-grade prototype that detects equipment anomalies, triages incidents,
 retrieves maintenance knowledge, forecasts resource needs, and produces
