@@ -86,14 +86,35 @@ class KnowledgeAgent:
     name = "Knowledge"
     guardrail = "Must cite the source document for every procedure."
 
-    def run(self, subsystem: str | None) -> AgentResult:
-        if not subsystem:
+    def run(self, subsystem: str | None, symptoms: str | None = None) -> AgentResult:
+        if not subsystem and not symptoms:
             return AgentResult(self.name, self.guardrail,
-                               {"docs": []}, ["no subsystem identified"])
-        docs = registry.call_tool("search_knowledge", subsystem=subsystem)
+                               {"docs": [], "retrieval": "none"},
+                               ["no subsystem identified"])
+
+        # Prefer semantic RAG retrieval if an index has been built; otherwise
+        # fall back to keyword search via the read-only registry. This keeps the
+        # project runnable even if the (optional, heavier) RAG deps aren't set up.
+        docs, mode = [], "keyword"
+        try:
+            from lithoops.rag.engine import Retriever, index_exists
+            if index_exists():
+                query = symptoms or f"{subsystem} fault procedure"
+                hits = Retriever().search(query, k=3)
+                docs = [{"doc_id": h["doc_id"], "title": h["title"],
+                         "content": h["content"], "score": h.get("score")}
+                        for h in hits]
+                mode = "semantic"
+        except Exception:
+            docs = []  # any RAG issue -> fall back cleanly
+
+        if not docs:
+            docs = registry.call_tool("search_knowledge", subsystem=subsystem)
+            mode = "keyword"
+
         return AgentResult(
             self.name, self.guardrail,
-            data={"docs": docs},
+            data={"docs": docs, "retrieval": mode},
             evidence=[f"cited {d['doc_id']}: {d['title']}" for d in docs],
         )
 
@@ -153,13 +174,31 @@ class CoordinatorAgent:
     name = "Coordinator"
     guardrail = "Requires human approval before any action."
 
-    def run(self, machine_id: str) -> dict:
-        mon = MonitoringAgent().run(machine_id)
-        triage = IncidentTriageAgent().run(mon)
-        subsystem = triage.data.get("suspected_subsystem")
-        knowledge = KnowledgeAgent().run(subsystem)
-        planning = PlanningAgent().run(subsystem)
-        handover = ShiftHandoverAgent().run(machine_id, mon, triage, planning)
+    def run(self, machine_id: str, tracer=None) -> dict:
+        # Optional observability: if a tracer is passed, each step is timed and
+        # recorded as a nested span. If not, behaviour is unchanged.
+        from contextlib import nullcontext
+
+        def span(name, **attrs):
+            return tracer.span(name, **attrs) if tracer else nullcontext()
+
+        with span("coordinator", machine_id=machine_id):
+            with span("agent:Monitoring"):
+                mon = MonitoringAgent().run(machine_id)
+            with span("agent:IncidentTriage"):
+                triage = IncidentTriageAgent().run(mon)
+            subsystem = triage.data.get("suspected_subsystem")
+            sig = mon.data.get("top_signals", [])
+            symptoms = ", ".join(f"{n} rising" for n, _ in sig) or None
+            with span("agent:Knowledge", subsystem=subsystem or "none"):
+                knowledge = KnowledgeAgent().run(subsystem, symptoms=symptoms)
+                if tracer:
+                    tracer.spans[-1].attributes["retrieval"] = knowledge.data.get("retrieval")
+                    tracer.spans[-1].attributes["docs"] = len(knowledge.data.get("docs", []))
+            with span("agent:Planning"):
+                planning = PlanningAgent().run(subsystem)
+            with span("agent:ShiftHandover"):
+                handover = ShiftHandoverAgent().run(machine_id, mon, triage, planning)
 
         all_evidence = (mon.evidence + triage.evidence + knowledge.evidence +
                         planning.evidence + handover.evidence)
@@ -178,4 +217,6 @@ class CoordinatorAgent:
             "guardrails": {a.agent: a.guardrail for a in
                            [mon, triage, knowledge, planning, handover]},
         }
+        if tracer:
+            rec["trace_id"] = tracer.run_id
         return rec
