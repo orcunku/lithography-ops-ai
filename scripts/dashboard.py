@@ -43,16 +43,23 @@ st.caption("PROTOTYPE · SYNTHETIC DATA · recommendations are read-only until a
 @st.cache_data
 def load_scored():
     p = DATA_DIR / "telemetry_scored.csv"
+    if not p.exists():
+        # On a fresh deploy the generated data won't exist yet — build it once.
+        from lithoops.data import generate_all
+        from lithoops.ml.engine import train
+        generate_all()
+        train()
     return pd.read_csv(p) if p.exists() else None
 
 
 scored = load_scored()
 if scored is None:
-    st.error("No trained model found. Run:  python scripts/build.py")
+    st.error("Could not build data. Check the logs.")
     st.stop()
 
-tab_fleet, tab_machine, tab_value, tab_audit = st.tabs(
-    ["\U0001f6f0 Fleet", "\U0001f52c Machine detail", "\U0001f4b6 Business value", "\U0001f4cb Audit trail"])
+tab_fleet, tab_machine, tab_value, tab_audit, tab_trace = st.tabs(
+    ["\U0001f6f0 Fleet", "\U0001f52c Machine detail", "\U0001f4b6 Business value",
+     "\U0001f4cb Audit trail", "\U0001f50d Traces"])
 
 with tab_fleet:
     st.subheader("Fleet status")
@@ -102,7 +109,10 @@ with tab_machine:
 
     st.subheader("Coordinator recommendation")
     if st.button("\u25b6 Run agent team", type="primary"):
-        st.session_state["rec"] = CoordinatorAgent().run(machine)
+        from lithoops.obs.tracer import Tracer
+        tracer = Tracer()
+        st.session_state["rec"] = CoordinatorAgent().run(machine, tracer=tracer)
+        tracer.save()
         store.save_recommendation(st.session_state["rec"])
 
     rec = st.session_state.get("rec")
@@ -153,3 +163,35 @@ with tab_audit:
                      use_container_width=True, hide_index=True)
     else:
         st.info("No actions logged yet. Run a recommendation and approve it.")
+
+with tab_trace:
+    st.subheader("Run traces (observability)")
+    st.caption("Every agent run is traced end to end: which step ran, what it "
+               "retrieved, and how long it took.")
+    from lithoops.obs.tracer import list_traces, get_trace
+    traces = list_traces()
+    if not traces:
+        st.info("No traces yet. Go to Machine detail and click 'Run agent team'.")
+    else:
+        options = {f"{t['run_id']}  ({t['total_ms']} ms)  {t['created_at']}": t["run_id"]
+                   for t in traces}
+        pick = st.selectbox("Select a run", list(options.keys()))
+        tr = get_trace(options[pick])
+        if tr:
+            st.metric("Total run time", f"{tr['total_ms']} ms")
+            # span timeline as a horizontal bar chart
+            rows = []
+            for s in tr["spans"]:
+                rows.append({"step": "\u00a0" * (s["depth"] * 2) + s["name"],
+                             "ms": s["duration_ms"],
+                             "detail": ", ".join(f"{k}={v}" for k, v in s["attributes"].items())})
+            df = pd.DataFrame(rows)
+            fig = go.Figure(go.Bar(
+                x=df["ms"], y=df["step"], orientation="h",
+                marker_color="#39c5cf", text=df["ms"], textposition="outside"))
+            fig.update_layout(template="plotly_dark", height=40 + 34 * len(df),
+                              margin=dict(l=0, r=0, t=6, b=0),
+                              paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#161b22",
+                              yaxis=dict(autorange="reversed"), xaxis_title="ms")
+            st.plotly_chart(fig, use_container_width=True)
+            st.dataframe(df, use_container_width=True, hide_index=True)
