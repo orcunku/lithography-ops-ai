@@ -1,0 +1,5 @@
+# Optional RAG (Stage A) dependencies — install these to enable semantic search
+# locally. Heavier than the core; on a low-RAM machine, use the Colab notebook
+# in notebooks/ instead.
+sentence-transformers>=2.2
+faiss-cpu>=1.7

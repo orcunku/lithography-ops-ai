@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": "../.github"
+		},
+		{
+			"path": "../data"
+		},
+		{
+			"path": "../docs"
+		},
+		{
+			"path": "../lithoops"
+		},
+		{
+			"path": "../scripts"
+		},
+		{
+			"path": "../tests"
+		}
+	]
+}
