@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LithoOps AI — Orcun Kusdemir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#070b16; --deep:#0d1424; --deep2:#131c30; --line:#22304d;
+    --cyan:#39c5cf; --amber:#f0a020; --red:#e5484d;
+    --ink:#e8eef7; --mut:#8ea0bd; --mut2:#5f708c;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--void);color:var(--ink);font-family:'Inter',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+  body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(60% 50% at 70% 0%,rgba(57,197,207,.10),transparent 60%),radial-gradient(50% 40% at 10% 20%,rgba(240,160,32,.06),transparent 60%)}
+  main{position:relative;z-index:1}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:rgba(7,11,22,.7);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .brand{font-family:'Space Grotesk';font-weight:700;letter-spacing:.5px;font-size:18px}
+  .brand span{color:var(--cyan)}
+  .navlinks{display:flex;gap:26px;align-items:center}
+  .navlinks a{color:var(--mut);text-decoration:none;font-size:14px;transition:color .2s}
+  .navlinks a:hover{color:var(--ink)}
+  .navcta{border:1px solid var(--cyan);color:var(--cyan);padding:7px 15px;border-radius:6px}
+  .navcta:hover{background:var(--cyan);color:var(--void)!important}
+  @media(max-width:640px){.navlinks a:not(.navcta){display:none}}
+
+  .hero{padding:88px 0 40px}
+  .eyebrow{font-family:'IBM Plex Mono';font-size:12.5px;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:22px;display:flex;align-items:center;gap:10px}
+  .eyebrow::before{content:"";width:34px;height:1px;background:var(--cyan)}
+  h1{font-family:'Space Grotesk';font-weight:700;font-size:clamp(34px,6vw,62px);line-height:1.04;letter-spacing:-1px;max-width:16ch;margin-bottom:22px}
+  h1 .glow{color:var(--cyan)}
+  .lede{font-size:clamp(16px,2.2vw,19px);color:var(--mut);max-width:60ch;margin-bottom:34px}
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+  .btn{font-family:'Space Grotesk';font-weight:600;font-size:15px;padding:13px 22px;border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;gap:9px;transition:transform .15s,box-shadow .15s;border:1px solid transparent}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-primary{background:var(--cyan);color:var(--void);box-shadow:0 6px 24px rgba(57,197,207,.28)}
+  .btn-primary:hover{box-shadow:0 10px 32px rgba(57,197,207,.42)}
+  .btn-ghost{border-color:var(--line);color:var(--ink);background:var(--deep)}
+  .btn-ghost:hover{border-color:var(--cyan);color:var(--cyan)}
+  .note{font-size:13px;color:var(--mut2);font-family:'IBM Plex Mono'}
+
+  .chart-card{margin-top:46px;background:linear-gradient(180deg,var(--deep),var(--void));border:1px solid var(--line);border-radius:14px;padding:22px 22px 12px;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+  .chart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:8px}
+  .chart-title{font-family:'IBM Plex Mono';font-size:12.5px;color:var(--mut);letter-spacing:1px}
+  .chart-legend{display:flex;gap:16px;font-family:'IBM Plex Mono';font-size:11.5px;color:var(--mut)}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  svg{display:block;width:100%;height:auto}
+
+  .metrics{padding:64px 0 20px}
+  .metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  @media(max-width:760px){.metrics-grid{grid-template-columns:repeat(2,1fr)}}
+  .metric{background:var(--deep);border:1px solid var(--line);border-radius:12px;padding:24px 20px;position:relative;overflow:hidden}
+  .metric::after{content:"";position:absolute;left:0;top:0;height:3px;width:100%;background:var(--cyan);opacity:.7}
+  .metric.amber::after{background:var(--amber)}
+  .metric .val{font-family:'Space Grotesk';font-weight:700;font-size:40px;line-height:1;letter-spacing:-1px}
+  .metric .lab{font-family:'IBM Plex Mono';font-size:12px;color:var(--mut);margin-top:10px;letter-spacing:.5px}
+  .metric .sub{font-size:12px;color:var(--mut2);margin-top:3px}
+
+  section{padding:60px 0}
+  .sec-eyebrow{font-family:'IBM Plex Mono';font-size:12px;letter-spacing:2px;color:var(--amber);text-transform:uppercase;margin-bottom:12px}
+  h2{font-family:'Space Grotesk';font-weight:700;font-size:clamp(26px,4vw,38px);letter-spacing:-.5px;margin-bottom:16px}
+  .sec-lede{color:var(--mut);max-width:64ch;margin-bottom:34px}
+
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:860px){.cards{grid-template-columns:1fr}}
+  .card{background:var(--deep);border:1px solid var(--line);border-radius:12px;padding:24px;transition:border-color .2s,transform .2s}
+  .card:hover{border-color:var(--cyan);transform:translateY(-3px)}
+  .card .num{font-family:'IBM Plex Mono';font-size:12px;color:var(--cyan);margin-bottom:12px}
+  .card h3{font-family:'Space Grotesk';font-size:18px;margin-bottom:8px}
+  .card p{font-size:14.5px;color:var(--mut)}
+
+  .pipe{display:flex;flex-direction:column}
+  .stage{display:grid;grid-template-columns:52px 1fr;gap:20px;padding:22px 0;border-top:1px solid var(--line);align-items:start}
+  .stage:last-child{border-bottom:1px solid var(--line)}
+  .stage .k{font-family:'IBM Plex Mono';font-size:13px;color:var(--amber);padding-top:2px}
+  .stage h4{font-family:'Space Grotesk';font-size:17px;margin-bottom:4px}
+  .stage p{font-size:14px;color:var(--mut)}
+  .stage .tools{font-family:'IBM Plex Mono';font-size:12px;color:var(--mut2);margin-top:6px}
+
+  .stack{display:flex;flex-wrap:wrap;gap:10px}
+  .chip{font-family:'IBM Plex Mono';font-size:13px;color:var(--ink);background:var(--deep2);border:1px solid var(--line);border-radius:20px;padding:8px 15px}
+  .chip b{color:var(--cyan);font-weight:500}
+
+  .final{text-align:center;padding:80px 0}
+  .final h2{max-width:20ch;margin:0 auto 18px}
+  .final .cta-row{justify-content:center}
+
+  footer{border-top:1px solid var(--line);padding:30px 0;color:var(--mut2);font-size:13px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .disc{max-width:70ch}
+
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="wrap">
+    <div class="brand">Litho<span>Ops</span> AI</div>
+    <div class="navlinks">
+      <a href="#what">What it does</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#stack">Stack</a>
+      <a class="navcta" href="https://github.com/orcunku/lithography-ops-ai" id="nav-github">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow reveal">Predictive operations intelligence</div>
+    <h1 class="reveal">AI that catches equipment failures <span class="glow">before they happen.</span></h1>
+    <p class="lede reveal">A self-directed AI/ML system for semiconductor lithography operations: it detects sensor anomalies early, predicts remaining useful life, retrieves the right repair procedure, and drafts a cited shift-handover report &mdash; with a human approving every action.</p>
+    <div class="cta-row reveal">
+      <a class="btn btn-primary" href="https://github.com/orcunku/lithography-ops-ai" id="cta-demo">&#9654; Try the live demo</a>
+      <a class="btn btn-ghost" href="https://github.com/orcunku/lithography-ops-ai" id="cta-github">View source on GitHub</a>
+      <a class="btn btn-ghost" href="https://github.com/orcunku/lithography-ops-ai/blob/main/docs/LithoOps_AI_Explanation_Report.pdf" id="cta-report">Read the report (PDF)</a>
+    </div>
+    <p class="note reveal">Synthetic data &middot; free &amp; open-source stack &middot; independent educational project</p>
+
+    <div class="chart-card reveal">
+      <div class="chart-head">
+        <span class="chart-title">LITHO-EUV-03 &middot; HEALTH SCORE (per minute)</span>
+        <span class="chart-legend">
+          <span><span class="dot" style="background:var(--cyan)"></span>health</span>
+          <span><span class="dot" style="background:var(--red)"></span>anomaly</span>
+        </span>
+      </div>
+      <svg id="healthChart" viewBox="0 0 1000 300" preserveAspectRatio="none" role="img" aria-label="Machine health score degrading over time with anomalies detected before failure"></svg>
+    </div>
+  </div>
+</header>
+
+<section class="metrics">
+  <div class="wrap">
+    <div class="metrics-grid">
+      <div class="metric reveal"><div class="val"><span class="count" data-to="93" data-suffix="%">0%</span></div><div class="lab">Anomaly recall</div><div class="sub">target &ge; 80%</div></div>
+      <div class="metric amber reveal"><div class="val"><span class="count" data-to="8" data-suffix="%">0%</span></div><div class="lab">False-alert rate</div><div class="sub">target &lt; 10%</div></div>
+      <div class="metric reveal"><div class="val"><span class="count" data-to="0.92" data-dec="2">0.00</span></div><div class="lab">Retrieval Hit@1</div><div class="sub">labelled test set</div></div>
+      <div class="metric reveal"><div class="val"><span class="count" data-to="100" data-suffix="%">0%</span></div><div class="lab">Human approval</div><div class="sub">on every action</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="what">
+  <div class="wrap">
+    <div class="sec-eyebrow reveal">What it does</div>
+    <h2 class="reveal">Six jobs, one operator workflow</h2>
+    <p class="sec-lede reveal">The system turns noisy machine telemetry into decisions an engineer can act on &mdash; always keeping a person in control.</p>
+    <div class="cards">
+      <div class="card reveal"><div class="num">01</div><h3>Detects anomalies early</h3><p>An Isolation Forest scores machine health from nine sensor signals and flags abnormal behaviour before it trips hard alarms.</p></div>
+      <div class="card reveal"><div class="num">02</div><h3>Predicts failure &amp; RUL</h3><p>Gradient-boosted models estimate near-term failure risk and how many minutes of useful life remain.</p></div>
+      <div class="card reveal"><div class="num">03</div><h3>Triages incidents</h3><p>A six-agent team ranks urgency and names the likely subsystem, always showing the sensor evidence behind it.</p></div>
+      <div class="card reveal"><div class="num">04</div><h3>Retrieves knowledge (RAG)</h3><p>Semantic search over a maintenance knowledge base finds the right procedure from plain-language symptoms.</p></div>
+      <div class="card reveal"><div class="num">05</div><h3>Writes cited reports</h3><p>A small local language model drafts a fluent shift-handover summary, grounded in the evidence and cited to source docs.</p></div>
+      <div class="card reveal"><div class="num">06</div><h3>Keeps humans in control</h3><p>Every recommendation is read-only until a person approves it, and every action is written to an append-only audit trail.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="pipeline">
+  <div class="wrap">
+    <div class="sec-eyebrow reveal">The pipeline</div>
+    <h2 class="reveal">From raw sensors to an approved decision</h2>
+    <p class="sec-lede reveal">Each stage was built, then measured &mdash; not assumed.</p>
+    <div class="pipe">
+      <div class="stage reveal"><div class="k">01</div><div><h4>Synthetic data + ML models</h4><p>Three simulated machines with labelled anomaly, failure and remaining-useful-life data.</p><div class="tools">scikit-learn &middot; pandas &middot; NumPy</div></div></div>
+      <div class="stage reveal"><div class="k">02</div><div><h4>Semantic retrieval (RAG)</h4><p>Maintenance docs embedded into a vector store; the right procedure is found by meaning, not keywords. Measured at 0.92 Hit@1.</p><div class="tools">sentence-transformers &middot; FAISS</div></div></div>
+      <div class="stage reveal"><div class="k">03</div><div><h4>Grounded generation</h4><p>A local language model turns evidence + retrieved procedures into a cited report, with checks against inventing facts.</p><div class="tools">Hugging Face Transformers</div></div></div>
+      <div class="stage reveal"><div class="k">04</div><div><h4>Evaluation harness</h4><p>Retrieval metrics (Hit@1, MRR) on a labelled set, plus a groundedness check that flags fabricated citations or invented numbers.</p><div class="tools">pytest &middot; custom metrics</div></div></div>
+      <div class="stage reveal"><div class="k">05</div><div><h4>Application &amp; governance</h4><p>A REST API and control-room dashboard, an MCP tool layer for read-only data access, and a full audit trail.</p><div class="tools">FastAPI &middot; Streamlit &middot; MCP &middot; SQLite</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="wrap">
+    <div class="sec-eyebrow reveal">Built with</div>
+    <h2 class="reveal">A free, open-source stack</h2>
+    <p class="sec-lede reveal">Everything runs at zero cost; heavy AI compute runs free on Google Colab.</p>
+    <div class="stack reveal">
+      <span class="chip"><b>Python</b></span>
+      <span class="chip"><b>scikit-learn</b> &middot; Isolation Forest, GBoost</span>
+      <span class="chip"><b>sentence-transformers</b></span>
+      <span class="chip"><b>FAISS</b> &middot; vector search</span>
+      <span class="chip"><b>Transformers</b> &middot; flan-t5</span>
+      <span class="chip"><b>FastAPI</b></span>
+      <span class="chip"><b>Streamlit</b> &middot; Plotly</span>
+      <span class="chip"><b>MCP</b> &middot; tool layer</span>
+      <span class="chip"><b>SQLite</b> &middot; audit trail</span>
+      <span class="chip"><b>pytest</b> &middot; 19 tests</span>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <div class="sec-eyebrow reveal" style="text-align:center">See it run</div>
+    <h2 class="reveal">Open the dashboard and move the sliders yourself.</h2>
+    <div class="cta-row reveal">
+      <a class="btn btn-primary" href="https://github.com/orcunku/lithography-ops-ai" id="cta-demo2">&#9654; Try the live demo</a>
+      <a class="btn btn-ghost" href="https://github.com/orcunku/lithography-ops-ai" id="cta-github2">View source on GitHub</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Built by <b style="color:var(--ink)">Orcun Kusdemir</b> &middot; AI/ML Engineer</span>
+    <span class="disc">Independent educational project. Synthetic data only. Does not belong to, and is not affiliated with, any company or entity.</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const svg=document.getElementById('healthChart');
+  const W=1000,H=300,N=180;
+  let pts=[],seed=7;
+  const rnd=()=>{seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;};
+  for(let i=0;i<N;i++){const t=i/(N-1);
+    let base=t<0.72?80:80-(t-0.72)/0.28*74;
+    let noise=(rnd()-0.5)*22*(t<0.72?1:0.4);
+    pts.push(Math.max(4,Math.min(100,base+noise)));}
+  const x=i=>i/(N-1)*W,y=v=>H-(v/100*(H-20))-10;
+  let line='M '+x(0)+' '+y(pts[0]);
+  for(let i=1;i<N;i++)line+=' L '+x(i)+' '+y(pts[i]);
+  const area=line+' L '+W+' '+H+' L 0 '+H+' Z';
+  let grid='';
+  for(let g=0;g<=4;g++){const yy=10+g*(H-20)/4;grid+='<line x1="0" y1="'+yy+'" x2="'+W+'" y2="'+yy+'" stroke="#22304d" stroke-width="1"/>';}
+  let dots='';
+  for(let i=0;i<N;i++){if(pts[i]<38)dots+='<circle class="anom" cx="'+x(i)+'" cy="'+y(pts[i])+'" r="3.4" fill="#e5484d" opacity="0"/>';}
+  svg.innerHTML='<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#39c5cf" stop-opacity="0.30"/><stop offset="100%" stop-color="#39c5cf" stop-opacity="0"/></linearGradient></defs>'
+    +grid+'<path d="'+area+'" fill="url(#g)"/><path id="hl" d="'+line+'" fill="none" stroke="#39c5cf" stroke-width="2.4"/>'+dots;
+  const hl=document.getElementById('hl'),len=hl.getTotalLength();
+  hl.style.strokeDasharray=len;hl.style.strokeDashoffset=len;
+  const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){
+    hl.animate([{strokeDashoffset:len},{strokeDashoffset:0}],{duration:2200,easing:'ease-out',fill:'forwards'});
+    setTimeout(()=>{document.querySelectorAll('.anom').forEach((d,i)=>setTimeout(()=>d.animate([{opacity:0},{opacity:1}],{duration:300,fill:'forwards'}),i*40));},1600);
+    io.disconnect();}});},{threshold:.3});
+  io.observe(svg);
+})();
+
+(function(){
+  const io=new IntersectionObserver(es=>{es.forEach(e=>{if(!e.isIntersecting)return;
+    const el=e.target,to=parseFloat(el.dataset.to),dec=parseInt(el.dataset.dec||'0'),suf=el.dataset.suffix||'';
+    const dur=1300,t0=performance.now();
+    const step=t=>{let p=Math.min(1,(t-t0)/dur);p=1-Math.pow(1-p,3);
+      el.textContent=(to*p).toFixed(dec)+suf;if(p<1)requestAnimationFrame(step);};
+    requestAnimationFrame(step);io.unobserve(el);});},{threshold:.6});
+  document.querySelectorAll('.count').forEach(el=>io.observe(el));
+})();
+
+(function(){
+  const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+})();
+</script>
+</body>
+</html>
